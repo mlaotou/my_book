@@ -1,0 +1,3 @@
+fig:scatter-plot
+scatter-plot
+scatter-fit-plot
