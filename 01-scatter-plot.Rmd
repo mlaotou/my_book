@@ -4,21 +4,9 @@
 
 ## 散点拟合图{#scatter-fit-plot}
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  message = FALSE,
-  warning = FALSE,
-  fig.align = 'center',
-  fig.width = 10,
-  fig.height = 8
-)
-```
-
 ```{r scatter-plot, fig.cap="散点拟合图示例",fig.width=8, fig.height=8}
 library(tidyverse)
 library(ggplot2)
-library(ggstyle)
 data(iris)
 # ==========================================
 # 计算拟合参数并生成图例标签
@@ -67,7 +55,6 @@ ggplot(iris, aes(x = Sepal.Width, y = Sepal.Length, color = Species, fill = Spec
     labels = legend_labels_map
   ) +
   theme_bw(base_size = 14) +
-  set_font() +
   theme(
     legend.position = c(0.8, 0.15),
     legend.title = element_blank(),

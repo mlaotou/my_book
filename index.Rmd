@@ -1,4 +1,4 @@
---- 
+---
 title: "MyRcode"
 author: "Milaotou"
 date: "`r Sys.Date()`"
@@ -6,9 +6,29 @@ site: bookdown::bookdown_site
 output:
   bookdown::gitbook: default
 documentclass: book
-# bibliography: [book.bib, packages.bib]
-# biblio-style: apalike
-# link-citations: yes
 ---
 
+```{r setup, include=FALSE}
+ knitr::opts_chunk$set(
+   echo = TRUE,
+   message = FALSE,
+   warning = FALSE,
+   fig.align = 'center',
+   fig.width = 10,
+   fig.height = 8
+ )
+```
+
+# 简介{#Introduction}
+
+本书收集了 R 语言基础绘图的各类示例，按图表类型分章节展示。每章包含完整的代码和可视化效果，帮助快速掌握 R 的绘图技巧。
+
+## 内容结构{#Structure}
+
+- **第一章：散点图** - 包含散点拟合图、多组别对比等
+- **第二章：线图** - 包含多线趋势图、时间序列展示等
+
+## 使用方法{#Use}
+
+本书使用 **bookdown** 生成，推荐在 RStudio 中打开项目并点击 "Build > Build Book" 进行渲染。
 
