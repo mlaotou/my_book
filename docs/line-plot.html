@@ -23,7 +23,7 @@
 <meta name="author" content="Milaotou" />
 
 
-<meta name="date" content="2026-04-21" />
+<meta name="date" content="2026-04-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -144,7 +144,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="2" data-path="scatter-plot.html"><a href="scatter-plot.html"><i class="fa fa-check"></i><b>2</b> R基础绘图系列-散点图</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot"><i class="fa fa-check"></i><b>2.1</b> 散点拟合图</a></li>
+<li class="chapter" data-level="2.1" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot1"><i class="fa fa-check"></i><b>2.1</b> 散点拟合图1</a></li>
+<li class="chapter" data-level="2.2" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot2"><i class="fa fa-check"></i><b>2.2</b> 散点拟合图2</a></li>
+<li class="chapter" data-level="2.3" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot3"><i class="fa fa-check"></i><b>2.3</b> 散点拟合图3</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="line-plot.html"><a href="line-plot.html"><i class="fa fa-check"></i><b>3</b> R基础绘图系列-线图</a>
 <ul>
@@ -172,69 +174,69 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>本章介绍R基础绘图系列-线图</p>
 <div id="multi-line-plot" class="section level2 hasAnchor" number="3.1">
 <h2><span class="header-section-number">3.1</span> 多线趋势图<a href="line-plot.html#multi-line-plot" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="line-plot.html#cb2-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb2-2"><a href="line-plot.html#cb2-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb2-3"><a href="line-plot.html#cb2-3" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="line-plot.html#cb2-4" tabindex="-1"></a><span class="co"># 创建示例数据：模拟时间序列数据</span></span>
-<span id="cb2-5"><a href="line-plot.html#cb2-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb2-6"><a href="line-plot.html#cb2-6" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb2-7"><a href="line-plot.html#cb2-7" tabindex="-1"></a>  <span class="at">day =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>,</span>
-<span id="cb2-8"><a href="line-plot.html#cb2-8" tabindex="-1"></a>  <span class="at">A =</span> <span class="fu">cumsum</span>(<span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="fl">0.5</span>, <span class="dv">1</span>)),</span>
-<span id="cb2-9"><a href="line-plot.html#cb2-9" tabindex="-1"></a>  <span class="at">B =</span> <span class="fu">cumsum</span>(<span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="fl">0.3</span>, <span class="fl">1.2</span>)),</span>
-<span id="cb2-10"><a href="line-plot.html#cb2-10" tabindex="-1"></a>  <span class="at">C =</span> <span class="fu">cumsum</span>(<span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>))</span>
-<span id="cb2-11"><a href="line-plot.html#cb2-11" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-12"><a href="line-plot.html#cb2-12" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(A, B, C), <span class="at">names_to =</span> <span class="st">&quot;group&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>)</span>
-<span id="cb2-13"><a href="line-plot.html#cb2-13" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="line-plot.html#cb2-14" tabindex="-1"></a><span class="co"># 计算每个组的统计信息</span></span>
-<span id="cb2-15"><a href="line-plot.html#cb2-15" tabindex="-1"></a>stats_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb2-16"><a href="line-plot.html#cb2-16" tabindex="-1"></a>  <span class="fu">group_by</span>(group) <span class="sc">%&gt;%</span></span>
-<span id="cb2-17"><a href="line-plot.html#cb2-17" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb2-18"><a href="line-plot.html#cb2-18" tabindex="-1"></a>    <span class="at">final_value =</span> <span class="fu">last</span>(value),</span>
-<span id="cb2-19"><a href="line-plot.html#cb2-19" tabindex="-1"></a>    <span class="at">mean_value =</span> <span class="fu">mean</span>(value),</span>
-<span id="cb2-20"><a href="line-plot.html#cb2-20" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>()</span>
-<span id="cb2-21"><a href="line-plot.html#cb2-21" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb2-22"><a href="line-plot.html#cb2-22" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-23"><a href="line-plot.html#cb2-23" tabindex="-1"></a>    <span class="at">legend_label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s (终值=%.1f, 均值=%.1f, N=%d)&quot;</span>, group, final_value, mean_value, N)</span>
-<span id="cb2-24"><a href="line-plot.html#cb2-24" tabindex="-1"></a>  )</span>
-<span id="cb2-25"><a href="line-plot.html#cb2-25" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="line-plot.html#cb2-26" tabindex="-1"></a>legend_labels_map <span class="ot">&lt;-</span> <span class="fu">setNames</span>(stats_df<span class="sc">$</span>legend_label, stats_df<span class="sc">$</span>group)</span>
-<span id="cb2-27"><a href="line-plot.html#cb2-27" tabindex="-1"></a></span>
-<span id="cb2-28"><a href="line-plot.html#cb2-28" tabindex="-1"></a><span class="co"># 绑定数据用于颜色映射</span></span>
-<span id="cb2-29"><a href="line-plot.html#cb2-29" tabindex="-1"></a>df<span class="sc">$</span>legend_group <span class="ot">&lt;-</span> legend_labels_map[df<span class="sc">$</span>group]</span>
-<span id="cb2-30"><a href="line-plot.html#cb2-30" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="line-plot.html#cb2-31" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> day, <span class="at">y =</span> value, <span class="at">color =</span> legend_group, <span class="at">linetype =</span> legend_group)) <span class="sc">+</span></span>
-<span id="cb2-32"><a href="line-plot.html#cb2-32" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="line-plot.html#cb2-33" tabindex="-1"></a>  <span class="co"># 绘制主线</span></span>
-<span id="cb2-34"><a href="line-plot.html#cb2-34" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb2-35"><a href="line-plot.html#cb2-35" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="line-plot.html#cb2-36" tabindex="-1"></a>  <span class="co"># 添加数据点</span></span>
-<span id="cb2-37"><a href="line-plot.html#cb2-37" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb2-38"><a href="line-plot.html#cb2-38" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="line-plot.html#cb2-39" tabindex="-1"></a>  <span class="co"># 颜色和线型设置</span></span>
-<span id="cb2-40"><a href="line-plot.html#cb2-40" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
-<span id="cb2-41"><a href="line-plot.html#cb2-41" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#3498db&quot;</span>, <span class="st">&quot;#2ecc71&quot;</span>),</span>
-<span id="cb2-42"><a href="line-plot.html#cb2-42" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
-<span id="cb2-43"><a href="line-plot.html#cb2-43" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb2-44"><a href="line-plot.html#cb2-44" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(</span>
-<span id="cb2-45"><a href="line-plot.html#cb2-45" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotted&quot;</span>),</span>
-<span id="cb2-46"><a href="line-plot.html#cb2-46" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
-<span id="cb2-47"><a href="line-plot.html#cb2-47" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb2-48"><a href="line-plot.html#cb2-48" tabindex="-1"></a></span>
-<span id="cb2-49"><a href="line-plot.html#cb2-49" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
-<span id="cb2-50"><a href="line-plot.html#cb2-50" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb2-51"><a href="line-plot.html#cb2-51" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>),</span>
-<span id="cb2-52"><a href="line-plot.html#cb2-52" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb2-53"><a href="line-plot.html#cb2-53" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
-<span id="cb2-54"><a href="line-plot.html#cb2-54" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>)</span>
-<span id="cb2-55"><a href="line-plot.html#cb2-55" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb2-56"><a href="line-plot.html#cb2-56" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb2-57"><a href="line-plot.html#cb2-57" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;天数&quot;</span>,</span>
-<span id="cb2-58"><a href="line-plot.html#cb2-58" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;累积值&quot;</span></span>
-<span id="cb2-59"><a href="line-plot.html#cb2-59" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb2-60"><a href="line-plot.html#cb2-60" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
-<span id="cb2-61"><a href="line-plot.html#cb2-61" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">3</span>)),</span>
-<span id="cb2-62"><a href="line-plot.html#cb2-62" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">3</span>))</span>
-<span id="cb2-63"><a href="line-plot.html#cb2-63" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="line-plot.html#cb6-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb6-2"><a href="line-plot.html#cb6-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb6-3"><a href="line-plot.html#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="line-plot.html#cb6-4" tabindex="-1"></a><span class="co"># 创建示例数据：模拟时间序列数据</span></span>
+<span id="cb6-5"><a href="line-plot.html#cb6-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb6-6"><a href="line-plot.html#cb6-6" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-7"><a href="line-plot.html#cb6-7" tabindex="-1"></a>  <span class="at">day =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>,</span>
+<span id="cb6-8"><a href="line-plot.html#cb6-8" tabindex="-1"></a>  <span class="at">A =</span> <span class="fu">cumsum</span>(<span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="fl">0.5</span>, <span class="dv">1</span>)),</span>
+<span id="cb6-9"><a href="line-plot.html#cb6-9" tabindex="-1"></a>  <span class="at">B =</span> <span class="fu">cumsum</span>(<span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="fl">0.3</span>, <span class="fl">1.2</span>)),</span>
+<span id="cb6-10"><a href="line-plot.html#cb6-10" tabindex="-1"></a>  <span class="at">C =</span> <span class="fu">cumsum</span>(<span class="fu">rnorm</span>(<span class="dv">30</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>))</span>
+<span id="cb6-11"><a href="line-plot.html#cb6-11" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-12"><a href="line-plot.html#cb6-12" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(A, B, C), <span class="at">names_to =</span> <span class="st">&quot;group&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>)</span>
+<span id="cb6-13"><a href="line-plot.html#cb6-13" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="line-plot.html#cb6-14" tabindex="-1"></a><span class="co"># 计算每个组的统计信息</span></span>
+<span id="cb6-15"><a href="line-plot.html#cb6-15" tabindex="-1"></a>stats_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb6-16"><a href="line-plot.html#cb6-16" tabindex="-1"></a>  <span class="fu">group_by</span>(group) <span class="sc">%&gt;%</span></span>
+<span id="cb6-17"><a href="line-plot.html#cb6-17" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb6-18"><a href="line-plot.html#cb6-18" tabindex="-1"></a>    <span class="at">final_value =</span> <span class="fu">last</span>(value),</span>
+<span id="cb6-19"><a href="line-plot.html#cb6-19" tabindex="-1"></a>    <span class="at">mean_value =</span> <span class="fu">mean</span>(value),</span>
+<span id="cb6-20"><a href="line-plot.html#cb6-20" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>()</span>
+<span id="cb6-21"><a href="line-plot.html#cb6-21" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb6-22"><a href="line-plot.html#cb6-22" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-23"><a href="line-plot.html#cb6-23" tabindex="-1"></a>    <span class="at">legend_label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s (终值=%.1f, 均值=%.1f, N=%d)&quot;</span>, group, final_value, mean_value, N)</span>
+<span id="cb6-24"><a href="line-plot.html#cb6-24" tabindex="-1"></a>  )</span>
+<span id="cb6-25"><a href="line-plot.html#cb6-25" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="line-plot.html#cb6-26" tabindex="-1"></a>legend_labels_map <span class="ot">&lt;-</span> <span class="fu">setNames</span>(stats_df<span class="sc">$</span>legend_label, stats_df<span class="sc">$</span>group)</span>
+<span id="cb6-27"><a href="line-plot.html#cb6-27" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="line-plot.html#cb6-28" tabindex="-1"></a><span class="co"># 绑定数据用于颜色映射</span></span>
+<span id="cb6-29"><a href="line-plot.html#cb6-29" tabindex="-1"></a>df<span class="sc">$</span>legend_group <span class="ot">&lt;-</span> legend_labels_map[df<span class="sc">$</span>group]</span>
+<span id="cb6-30"><a href="line-plot.html#cb6-30" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="line-plot.html#cb6-31" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> day, <span class="at">y =</span> value, <span class="at">color =</span> legend_group, <span class="at">linetype =</span> legend_group)) <span class="sc">+</span></span>
+<span id="cb6-32"><a href="line-plot.html#cb6-32" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="line-plot.html#cb6-33" tabindex="-1"></a>  <span class="co"># 绘制主线</span></span>
+<span id="cb6-34"><a href="line-plot.html#cb6-34" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb6-35"><a href="line-plot.html#cb6-35" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="line-plot.html#cb6-36" tabindex="-1"></a>  <span class="co"># 添加数据点</span></span>
+<span id="cb6-37"><a href="line-plot.html#cb6-37" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">shape =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb6-38"><a href="line-plot.html#cb6-38" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="line-plot.html#cb6-39" tabindex="-1"></a>  <span class="co"># 颜色和线型设置</span></span>
+<span id="cb6-40"><a href="line-plot.html#cb6-40" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
+<span id="cb6-41"><a href="line-plot.html#cb6-41" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#3498db&quot;</span>, <span class="st">&quot;#2ecc71&quot;</span>),</span>
+<span id="cb6-42"><a href="line-plot.html#cb6-42" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
+<span id="cb6-43"><a href="line-plot.html#cb6-43" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-44"><a href="line-plot.html#cb6-44" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(</span>
+<span id="cb6-45"><a href="line-plot.html#cb6-45" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dashed&quot;</span>, <span class="st">&quot;dotted&quot;</span>),</span>
+<span id="cb6-46"><a href="line-plot.html#cb6-46" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
+<span id="cb6-47"><a href="line-plot.html#cb6-47" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-48"><a href="line-plot.html#cb6-48" tabindex="-1"></a></span>
+<span id="cb6-49"><a href="line-plot.html#cb6-49" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb6-50"><a href="line-plot.html#cb6-50" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb6-51"><a href="line-plot.html#cb6-51" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>),</span>
+<span id="cb6-52"><a href="line-plot.html#cb6-52" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb6-53"><a href="line-plot.html#cb6-53" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb6-54"><a href="line-plot.html#cb6-54" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb6-55"><a href="line-plot.html#cb6-55" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-56"><a href="line-plot.html#cb6-56" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-57"><a href="line-plot.html#cb6-57" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;天数&quot;</span>,</span>
+<span id="cb6-58"><a href="line-plot.html#cb6-58" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;累积值&quot;</span></span>
+<span id="cb6-59"><a href="line-plot.html#cb6-59" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-60"><a href="line-plot.html#cb6-60" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
+<span id="cb6-61"><a href="line-plot.html#cb6-61" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">3</span>)),</span>
+<span id="cb6-62"><a href="line-plot.html#cb6-62" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">3</span>))</span>
+<span id="cb6-63"><a href="line-plot.html#cb6-63" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:line-plot"></span>
 <img src="assets/figure-line-plot-1.png" alt="多线趋势图示例" width="768" />
 <p class="caption">

@@ -23,7 +23,7 @@
 <meta name="author" content="Milaotou" />
 
 
-<meta name="date" content="2026-04-21" />
+<meta name="date" content="2026-04-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -144,7 +144,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="2" data-path="scatter-plot.html"><a href="scatter-plot.html"><i class="fa fa-check"></i><b>2</b> R基础绘图系列-散点图</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot"><i class="fa fa-check"></i><b>2.1</b> 散点拟合图</a></li>
+<li class="chapter" data-level="2.1" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot1"><i class="fa fa-check"></i><b>2.1</b> 散点拟合图1</a></li>
+<li class="chapter" data-level="2.2" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot2"><i class="fa fa-check"></i><b>2.2</b> 散点拟合图2</a></li>
+<li class="chapter" data-level="2.3" data-path="scatter-plot.html"><a href="scatter-plot.html#scatter-fit-plot3"><i class="fa fa-check"></i><b>2.3</b> 散点拟合图3</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="line-plot.html"><a href="line-plot.html"><i class="fa fa-check"></i><b>3</b> R基础绘图系列-线图</a>
 <ul>
@@ -170,73 +172,167 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="scatter-plot" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">Chapter 2</span> R基础绘图系列-散点图<a href="scatter-plot.html#scatter-plot" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>本章介绍R基础绘图系列-散点图</p>
-<div id="scatter-fit-plot" class="section level2 hasAnchor" number="2.1">
-<h2><span class="header-section-number">2.1</span> 散点拟合图<a href="scatter-plot.html#scatter-fit-plot" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="scatter-fit-plot1" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> 散点拟合图1<a href="scatter-plot.html#scatter-fit-plot1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="scatter-plot.html#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="scatter-plot.html#cb1-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-3"><a href="scatter-plot.html#cb1-3" tabindex="-1"></a><span class="fu">data</span>(iris)</span>
-<span id="cb1-4"><a href="scatter-plot.html#cb1-4" tabindex="-1"></a><span class="co"># ==========================================</span></span>
-<span id="cb1-5"><a href="scatter-plot.html#cb1-5" tabindex="-1"></a><span class="co"># 计算拟合参数并生成图例标签</span></span>
-<span id="cb1-6"><a href="scatter-plot.html#cb1-6" tabindex="-1"></a><span class="co"># ==========================================</span></span>
-<span id="cb1-7"><a href="scatter-plot.html#cb1-7" tabindex="-1"></a><span class="co"># 针对每个组别计算 R2, RMSE 和 N</span></span>
-<span id="cb1-8"><a href="scatter-plot.html#cb1-8" tabindex="-1"></a>stats_data <span class="ot">&lt;-</span> iris <span class="sc">%&gt;%</span></span>
-<span id="cb1-9"><a href="scatter-plot.html#cb1-9" tabindex="-1"></a>  <span class="fu">select</span>(Species, Sepal.Length, Sepal.Width) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-10"><a href="scatter-plot.html#cb1-10" tabindex="-1"></a>  <span class="fu">group_by</span>(Species) <span class="sc">%&gt;%</span></span>
-<span id="cb1-11"><a href="scatter-plot.html#cb1-11" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb1-12"><a href="scatter-plot.html#cb1-12" tabindex="-1"></a>    <span class="at">model =</span> <span class="fu">list</span>(<span class="fu">lm</span>(Sepal.Width <span class="sc">~</span> Sepal.Length)),  <span class="co"># 明确指定 x 和 y</span></span>
-<span id="cb1-13"><a href="scatter-plot.html#cb1-13" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>(),</span>
-<span id="cb1-14"><a href="scatter-plot.html#cb1-14" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb1-15"><a href="scatter-plot.html#cb1-15" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-16"><a href="scatter-plot.html#cb1-16" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-17"><a href="scatter-plot.html#cb1-17" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-18"><a href="scatter-plot.html#cb1-18" tabindex="-1"></a>    <span class="at">r2 =</span> <span class="fu">summary</span>(model)<span class="sc">$</span>r.squared,</span>
-<span id="cb1-19"><a href="scatter-plot.html#cb1-19" tabindex="-1"></a>    <span class="at">rmse =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>(<span class="fu">summary</span>(model)<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)),</span>
-<span id="cb1-20"><a href="scatter-plot.html#cb1-20" tabindex="-1"></a>    <span class="at">legend_label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s (R²=%.2f, RMSE=%.1f, N=%d)&quot;</span>, Species, r2, rmse, N)</span>
-<span id="cb1-21"><a href="scatter-plot.html#cb1-21" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-22"><a href="scatter-plot.html#cb1-22" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb1-23"><a href="scatter-plot.html#cb1-23" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="scatter-plot.html#cb1-24" tabindex="-1"></a><span class="co"># 将标签转换为命名向量，方便映射到颜色上</span></span>
-<span id="cb1-25"><a href="scatter-plot.html#cb1-25" tabindex="-1"></a>legend_labels_map <span class="ot">&lt;-</span> <span class="fu">setNames</span>(stats_data<span class="sc">$</span>legend_label, stats_data<span class="sc">$</span>Species)</span>
-<span id="cb1-26"><a href="scatter-plot.html#cb1-26" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="scatter-plot.html#cb1-27" tabindex="-1"></a><span class="fu">ggplot</span>(iris, <span class="fu">aes</span>(<span class="at">x =</span> Sepal.Width, <span class="at">y =</span> Sepal.Length, <span class="at">color =</span> Species, <span class="at">fill =</span> Species)) <span class="sc">+</span></span>
-<span id="cb1-28"><a href="scatter-plot.html#cb1-28" tabindex="-1"></a>  </span>
-<span id="cb1-29"><a href="scatter-plot.html#cb1-29" tabindex="-1"></a>  <span class="co"># 置信区间（只显示填充区域）</span></span>
-<span id="cb1-30"><a href="scatter-plot.html#cb1-30" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="cn">NA</span>, <span class="at">fill =</span> <span class="st">&quot;grey70&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-31"><a href="scatter-plot.html#cb1-31" tabindex="-1"></a>  </span>
-<span id="cb1-32"><a href="scatter-plot.html#cb1-32" tabindex="-1"></a>  <span class="co"># 白色边缘效果（先绘制粗的白线）</span></span>
-<span id="cb1-33"><a href="scatter-plot.html#cb1-33" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-34"><a href="scatter-plot.html#cb1-34" tabindex="-1"></a>  </span>
-<span id="cb1-35"><a href="scatter-plot.html#cb1-35" tabindex="-1"></a>  <span class="co"># 主要回归线（后绘制细的彩色线）</span></span>
-<span id="cb1-36"><a href="scatter-plot.html#cb1-36" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">size =</span> <span class="fl">2.4</span>) <span class="sc">+</span></span>
-<span id="cb1-37"><a href="scatter-plot.html#cb1-37" tabindex="-1"></a>  </span>
-<span id="cb1-38"><a href="scatter-plot.html#cb1-38" tabindex="-1"></a>  <span class="co"># 绘制散点</span></span>
-<span id="cb1-39"><a href="scatter-plot.html#cb1-39" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">size =</span> <span class="dv">3</span>,<span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
-<span id="cb1-40"><a href="scatter-plot.html#cb1-40" tabindex="-1"></a>  </span>
-<span id="cb1-41"><a href="scatter-plot.html#cb1-41" tabindex="-1"></a>  <span class="co"># 颜色设置 (使用我们计算好的动态标签 legend_labels_map)</span></span>
-<span id="cb1-42"><a href="scatter-plot.html#cb1-42" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
-<span id="cb1-43"><a href="scatter-plot.html#cb1-43" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#1e4d4d&quot;</span>, <span class="st">&quot;#ff7f7f&quot;</span>, <span class="st">&quot;#3d3d5c&quot;</span>),</span>
-<span id="cb1-44"><a href="scatter-plot.html#cb1-44" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
-<span id="cb1-45"><a href="scatter-plot.html#cb1-45" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb1-46"><a href="scatter-plot.html#cb1-46" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
-<span id="cb1-47"><a href="scatter-plot.html#cb1-47" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#1e4d4d&quot;</span>,  <span class="st">&quot;#ff7f7f&quot;</span>, <span class="st">&quot;#3d3d5c&quot;</span>),</span>
-<span id="cb1-48"><a href="scatter-plot.html#cb1-48" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
-<span id="cb1-49"><a href="scatter-plot.html#cb1-49" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb1-50"><a href="scatter-plot.html#cb1-50" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
-<span id="cb1-51"><a href="scatter-plot.html#cb1-51" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb1-52"><a href="scatter-plot.html#cb1-52" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.15</span>),</span>
-<span id="cb1-53"><a href="scatter-plot.html#cb1-53" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb1-54"><a href="scatter-plot.html#cb1-54" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">7</span>),</span>
-<span id="cb1-55"><a href="scatter-plot.html#cb1-55" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>)</span>
-<span id="cb1-56"><a href="scatter-plot.html#cb1-56" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb1-57"><a href="scatter-plot.html#cb1-57" tabindex="-1"></a>  <span class="co"># 优化图例图标形状：取消散点和阴影，仅显示为粗横线</span></span>
-<span id="cb1-58"><a href="scatter-plot.html#cb1-58" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
-<span id="cb1-59"><a href="scatter-plot.html#cb1-59" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">6</span>, <span class="at">shape =</span> <span class="cn">NA</span>, <span class="at">fill =</span> <span class="cn">NA</span>)),</span>
-<span id="cb1-60"><a href="scatter-plot.html#cb1-60" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;none&quot;</span> <span class="co"># 隐藏多余的填充图例</span></span>
-<span id="cb1-61"><a href="scatter-plot.html#cb1-61" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scatter-plot"></span>
-<img src="assets/figure-scatter-plot-1.png" alt="散点拟合图示例" width="768" />
+<span id="cb1-4"><a href="scatter-plot.html#cb1-4" tabindex="-1"></a><span class="co"># 计算拟合参数并生成图例标签</span></span>
+<span id="cb1-5"><a href="scatter-plot.html#cb1-5" tabindex="-1"></a><span class="co"># 针对每个组别计算 R2, RMSE 和 N</span></span>
+<span id="cb1-6"><a href="scatter-plot.html#cb1-6" tabindex="-1"></a>stats_data <span class="ot">&lt;-</span> iris <span class="sc">%&gt;%</span></span>
+<span id="cb1-7"><a href="scatter-plot.html#cb1-7" tabindex="-1"></a>  <span class="fu">select</span>(Species, Sepal.Length, Sepal.Width) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-8"><a href="scatter-plot.html#cb1-8" tabindex="-1"></a>  <span class="fu">group_by</span>(Species) <span class="sc">%&gt;%</span></span>
+<span id="cb1-9"><a href="scatter-plot.html#cb1-9" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb1-10"><a href="scatter-plot.html#cb1-10" tabindex="-1"></a>    <span class="at">model =</span> <span class="fu">list</span>(<span class="fu">lm</span>(Sepal.Width <span class="sc">~</span> Sepal.Length)),  <span class="co"># 明确指定 x 和 y</span></span>
+<span id="cb1-11"><a href="scatter-plot.html#cb1-11" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb1-12"><a href="scatter-plot.html#cb1-12" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb1-13"><a href="scatter-plot.html#cb1-13" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb1-14"><a href="scatter-plot.html#cb1-14" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb1-15"><a href="scatter-plot.html#cb1-15" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-16"><a href="scatter-plot.html#cb1-16" tabindex="-1"></a>    <span class="at">r2 =</span> <span class="fu">summary</span>(model)<span class="sc">$</span>r.squared,</span>
+<span id="cb1-17"><a href="scatter-plot.html#cb1-17" tabindex="-1"></a>    <span class="at">rmse =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>(<span class="fu">summary</span>(model)<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb1-18"><a href="scatter-plot.html#cb1-18" tabindex="-1"></a>    <span class="at">legend_label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%s (R²=%.2f, RMSE=%.1f, N=%d)&quot;</span>, Species, r2, rmse, N)</span>
+<span id="cb1-19"><a href="scatter-plot.html#cb1-19" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb1-20"><a href="scatter-plot.html#cb1-20" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb1-21"><a href="scatter-plot.html#cb1-21" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="scatter-plot.html#cb1-22" tabindex="-1"></a><span class="co"># 将标签转换为命名向量，方便映射到颜色上</span></span>
+<span id="cb1-23"><a href="scatter-plot.html#cb1-23" tabindex="-1"></a>legend_labels_map <span class="ot">&lt;-</span> <span class="fu">setNames</span>(stats_data<span class="sc">$</span>legend_label, stats_data<span class="sc">$</span>Species)</span>
+<span id="cb1-24"><a href="scatter-plot.html#cb1-24" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="scatter-plot.html#cb1-25" tabindex="-1"></a><span class="fu">ggplot</span>(iris, <span class="fu">aes</span>(<span class="at">x =</span> Sepal.Width, <span class="at">y =</span> Sepal.Length, <span class="at">color =</span> Species, <span class="at">fill =</span> Species)) <span class="sc">+</span></span>
+<span id="cb1-26"><a href="scatter-plot.html#cb1-26" tabindex="-1"></a>  </span>
+<span id="cb1-27"><a href="scatter-plot.html#cb1-27" tabindex="-1"></a>  <span class="co"># 置信区间（只显示填充区域）</span></span>
+<span id="cb1-28"><a href="scatter-plot.html#cb1-28" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="cn">NA</span>, <span class="at">fill =</span> <span class="st">&quot;grey70&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-29"><a href="scatter-plot.html#cb1-29" tabindex="-1"></a>  </span>
+<span id="cb1-30"><a href="scatter-plot.html#cb1-30" tabindex="-1"></a>  <span class="co"># 白色边缘效果（先绘制粗的白线）</span></span>
+<span id="cb1-31"><a href="scatter-plot.html#cb1-31" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-32"><a href="scatter-plot.html#cb1-32" tabindex="-1"></a>  </span>
+<span id="cb1-33"><a href="scatter-plot.html#cb1-33" tabindex="-1"></a>  <span class="co"># 主要回归线（后绘制细的彩色线）</span></span>
+<span id="cb1-34"><a href="scatter-plot.html#cb1-34" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">size =</span> <span class="fl">2.4</span>) <span class="sc">+</span></span>
+<span id="cb1-35"><a href="scatter-plot.html#cb1-35" tabindex="-1"></a>  </span>
+<span id="cb1-36"><a href="scatter-plot.html#cb1-36" tabindex="-1"></a>  <span class="co"># 绘制散点</span></span>
+<span id="cb1-37"><a href="scatter-plot.html#cb1-37" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">size =</span> <span class="dv">3</span>,<span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb1-38"><a href="scatter-plot.html#cb1-38" tabindex="-1"></a>  </span>
+<span id="cb1-39"><a href="scatter-plot.html#cb1-39" tabindex="-1"></a>  <span class="co"># 颜色设置 (使用我们计算好的动态标签 legend_labels_map)</span></span>
+<span id="cb1-40"><a href="scatter-plot.html#cb1-40" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
+<span id="cb1-41"><a href="scatter-plot.html#cb1-41" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#1e4d4d&quot;</span>, <span class="st">&quot;#ff7f7f&quot;</span>, <span class="st">&quot;#3d3d5c&quot;</span>),</span>
+<span id="cb1-42"><a href="scatter-plot.html#cb1-42" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
+<span id="cb1-43"><a href="scatter-plot.html#cb1-43" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-44"><a href="scatter-plot.html#cb1-44" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb1-45"><a href="scatter-plot.html#cb1-45" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#1e4d4d&quot;</span>,  <span class="st">&quot;#ff7f7f&quot;</span>, <span class="st">&quot;#3d3d5c&quot;</span>),</span>
+<span id="cb1-46"><a href="scatter-plot.html#cb1-46" tabindex="-1"></a>    <span class="at">labels =</span> legend_labels_map</span>
+<span id="cb1-47"><a href="scatter-plot.html#cb1-47" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-48"><a href="scatter-plot.html#cb1-48" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb1-49"><a href="scatter-plot.html#cb1-49" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb1-50"><a href="scatter-plot.html#cb1-50" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.15</span>),</span>
+<span id="cb1-51"><a href="scatter-plot.html#cb1-51" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb1-52"><a href="scatter-plot.html#cb1-52" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">7</span>),</span>
+<span id="cb1-53"><a href="scatter-plot.html#cb1-53" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb1-54"><a href="scatter-plot.html#cb1-54" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-55"><a href="scatter-plot.html#cb1-55" tabindex="-1"></a>  <span class="co"># 优化图例图标形状：取消散点和阴影，仅显示为粗横线</span></span>
+<span id="cb1-56"><a href="scatter-plot.html#cb1-56" tabindex="-1"></a>  <span class="fu">guides</span>(</span>
+<span id="cb1-57"><a href="scatter-plot.html#cb1-57" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">6</span>, <span class="at">shape =</span> <span class="cn">NA</span>, <span class="at">fill =</span> <span class="cn">NA</span>)),</span>
+<span id="cb1-58"><a href="scatter-plot.html#cb1-58" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;none&quot;</span> <span class="co"># 隐藏多余的填充图例</span></span>
+<span id="cb1-59"><a href="scatter-plot.html#cb1-59" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scatter-plot1"></span>
+<img src="assets/figure-scatter-plot1-1.png" alt="散点拟合图示例1" width="576" />
 <p class="caption">
-Figure 2.1: 散点拟合图示例
+Figure 2.1: 散点拟合图示例1
+</p>
+</div>
+</div>
+<div id="scatter-fit-plot2" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> 散点拟合图2<a href="scatter-plot.html#scatter-fit-plot2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="scatter-plot.html#cb2-1" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb2-2"><a href="scatter-plot.html#cb2-2" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb2-3"><a href="scatter-plot.html#cb2-3" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb2-4"><a href="scatter-plot.html#cb2-4" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-5"><a href="scatter-plot.html#cb2-5" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-6"><a href="scatter-plot.html#cb2-6" tabindex="-1"></a><span class="fu">library</span>(gglmannotate) <span class="co"># 添加线性注释参数</span></span>
+<span id="cb2-7"><a href="scatter-plot.html#cb2-7" tabindex="-1"></a><span class="co"># 加载数据</span></span>
+<span id="cb2-8"><a href="scatter-plot.html#cb2-8" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">&quot;data/line_fit_data1.xlsx&quot;</span>, <span class="at">col_names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-9"><a href="scatter-plot.html#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="scatter-plot.html#cb2-10" tabindex="-1"></a><span class="co"># 选择需要的列：ID, POC, MAOC, Aridity</span></span>
+<span id="cb2-11"><a href="scatter-plot.html#cb2-11" tabindex="-1"></a>df_sub <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(ID, POC, MAOC, Aridity)</span>
+<span id="cb2-12"><a href="scatter-plot.html#cb2-12" tabindex="-1"></a><span class="fu">head</span>(df_sub)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 4
+##      ID   POC  MAOC Aridity
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+## 1     1  1.83  4.85   0.830
+## 2     2  1.13  2.61   0.832
+## 3     3  2.81  5.17   0.832
+## 4     4  3.50  5.08   0.851
+## 5     5  1.66  2.67   0.851
+## 6     6  3.10  2.25   0.852</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="scatter-plot.html#cb4-1" tabindex="-1"></a><span class="co"># 确定 x 和 y 的最大范围</span></span>
+<span id="cb4-2"><a href="scatter-plot.html#cb4-2" tabindex="-1"></a>max_range <span class="ot">&lt;-</span> <span class="fu">max</span>(df_sub<span class="sc">$</span>POC, df_sub<span class="sc">$</span>MAOC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="dv">100</span></span>
+<span id="cb4-3"><a href="scatter-plot.html#cb4-3" tabindex="-1"></a>min_range <span class="ot">&lt;-</span> <span class="fu">min</span>(df_sub<span class="sc">$</span>POC, df_sub<span class="sc">$</span>MAOC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-4"><a href="scatter-plot.html#cb4-4" tabindex="-1"></a><span class="co"># 使用ggplot2绘制散点图和线性拟合曲线</span></span>
+<span id="cb4-5"><a href="scatter-plot.html#cb4-5" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> df_sub <span class="sc">%&gt;%</span></span>
+<span id="cb4-6"><a href="scatter-plot.html#cb4-6" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> POC, <span class="at">y =</span> MAOC)) <span class="sc">+</span> </span>
+<span id="cb4-7"><a href="scatter-plot.html#cb4-7" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> Aridity), <span class="at">size =</span> <span class="fl">3.5</span>) <span class="sc">+</span>  <span class="co"># 根据Aridity着色的散点图</span></span>
+<span id="cb4-8"><a href="scatter-plot.html#cb4-8" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">color =</span> <span class="st">&quot;#d7301f&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;#fc8d59&quot;</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span>  <span class="co"># 线性拟合曲线</span></span>
+<span id="cb4-9"><a href="scatter-plot.html#cb4-9" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;#969696&quot;</span>) <span class="sc">+</span>  <span class="co"># 添加y=x的参考线</span></span>
+<span id="cb4-10"><a href="scatter-plot.html#cb4-10" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">trans =</span> <span class="fu">log_trans</span>(),  <span class="co"># y轴对数变换</span></span>
+<span id="cb4-11"><a href="scatter-plot.html#cb4-11" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">number</span>(x, <span class="at">accuracy =</span> <span class="fl">0.01</span>),  <span class="co"># y轴标签格式化</span></span>
+<span id="cb4-12"><a href="scatter-plot.html#cb4-12" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),  <span class="co"># 去除y轴扩展</span></span>
+<span id="cb4-13"><a href="scatter-plot.html#cb4-13" tabindex="-1"></a>                     <span class="at">limits =</span> <span class="fu">c</span>(min_range, max_range)) <span class="sc">+</span>  <span class="co"># 设置y轴范围</span></span>
+<span id="cb4-14"><a href="scatter-plot.html#cb4-14" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">trans =</span> <span class="fu">log_trans</span>(),  <span class="co"># x轴对数变换</span></span>
+<span id="cb4-15"><a href="scatter-plot.html#cb4-15" tabindex="-1"></a>                     <span class="co"># labels = function(x) {round(x, 1)},  # x轴标签格式化</span></span>
+<span id="cb4-16"><a href="scatter-plot.html#cb4-16" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">number</span>(x, <span class="at">accuracy =</span> <span class="fl">0.01</span>),  <span class="co"># x轴标签格式化,round对于整数不显示.0，number函数更适合</span></span>
+<span id="cb4-17"><a href="scatter-plot.html#cb4-17" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>),  <span class="co"># 去除x轴扩展</span></span>
+<span id="cb4-18"><a href="scatter-plot.html#cb4-18" tabindex="-1"></a>                     <span class="at">limits =</span> <span class="fu">c</span>(min_range, max_range)) <span class="sc">+</span>  <span class="co"># 设置x轴范围</span></span>
+<span id="cb4-19"><a href="scatter-plot.html#cb4-19" tabindex="-1"></a>  <span class="fu">annotation_logticks</span>(<span class="at">sides =</span> <span class="st">&quot;bl&quot;</span>, <span class="at">outside =</span> <span class="cn">FALSE</span>,  <span class="co"># 添加对数刻度线</span></span>
+<span id="cb4-20"><a href="scatter-plot.html#cb4-20" tabindex="-1"></a>                      <span class="at">short =</span> <span class="fu">unit</span>(<span class="fl">0.2</span>, <span class="st">&quot;cm&quot;</span>),</span>
+<span id="cb4-21"><a href="scatter-plot.html#cb4-21" tabindex="-1"></a>                      <span class="at">mid =</span> <span class="fu">unit</span>(<span class="fl">0.4</span>, <span class="st">&quot;cm&quot;</span>),</span>
+<span id="cb4-22"><a href="scatter-plot.html#cb4-22" tabindex="-1"></a>                      <span class="at">long =</span> <span class="fu">unit</span>(<span class="fl">0.6</span>, <span class="st">&quot;cm&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb4-23"><a href="scatter-plot.html#cb4-23" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="fu">aes</span>(<span class="at">color =</span> Aridity), <span class="at">length =</span> <span class="fu">unit</span>(<span class="fl">0.03</span>, <span class="st">&quot;npc&quot;</span>)) <span class="sc">+</span>  <span class="co"># 添加边缘线</span></span>
+<span id="cb4-24"><a href="scatter-plot.html#cb4-24" tabindex="-1"></a>  <span class="fu">geom_lmannotate</span>(<span class="at">colour =</span> <span class="st">&quot;#3635F6&quot;</span>) <span class="sc">+</span> <span class="co"># 添加拟合参数注释</span></span>
+<span id="cb4-25"><a href="scatter-plot.html#cb4-25" tabindex="-1"></a>  <span class="co"># scale_color_viridis(option = &quot;plasma&quot;) +  # 设置颜色映射</span></span>
+<span id="cb4-26"><a href="scatter-plot.html#cb4-26" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">&quot;#CE78B3FF&quot;</span>,<span class="at">high =</span> <span class="st">&quot;#573B88FF&quot;</span>)<span class="sc">+</span></span>
+<span id="cb4-27"><a href="scatter-plot.html#cb4-27" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(<span class="fu">atop</span>(<span class="st">&quot;POC content&quot;</span><span class="sc">~</span><span class="fu">paste</span>(<span class="st">&quot;(&quot;</span>,<span class="sc">~</span><span class="st">&quot;gC&quot;</span>,<span class="sc">~</span><span class="st">&quot;kg&quot;</span><span class="sc">^</span><span class="st">&quot;-1&quot;</span><span class="sc">~</span><span class="st">&quot;soil&quot;</span>,<span class="sc">~</span><span class="st">&quot;)&quot;</span>))),  <span class="co"># 自定义x轴标签</span></span>
+<span id="cb4-28"><a href="scatter-plot.html#cb4-28" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">expression</span>(<span class="fu">atop</span>(<span class="st">&quot;MAOC content&quot;</span><span class="sc">~</span><span class="fu">paste</span>(<span class="st">&quot;(&quot;</span>,<span class="sc">~</span><span class="st">&quot;gC&quot;</span>,<span class="sc">~</span><span class="st">&quot;kg&quot;</span><span class="sc">^</span><span class="st">&quot;-1&quot;</span><span class="sc">~</span><span class="st">&quot;soil&quot;</span>,<span class="sc">~</span><span class="st">&quot;)&quot;</span>)))) <span class="sc">+</span>  <span class="co"># 自定义y轴标签</span></span>
+<span id="cb4-29"><a href="scatter-plot.html#cb4-29" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span>  <span class="co"># 使用白色背景主题</span></span>
+<span id="cb4-30"><a href="scatter-plot.html#cb4-30" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">&quot;#000000&quot;</span>),  <span class="co"># 自定义轴文本样式</span></span>
+<span id="cb4-31"><a href="scatter-plot.html#cb4-31" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">&quot;#000000&quot;</span>),</span>
+<span id="cb4-32"><a href="scatter-plot.html#cb4-32" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>, <span class="at">color =</span> <span class="st">&quot;#000000&quot;</span>),</span>
+<span id="cb4-33"><a href="scatter-plot.html#cb4-33" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">20</span>, <span class="at">color =</span> <span class="st">&quot;#000000&quot;</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb4-34"><a href="scatter-plot.html#cb4-34" tabindex="-1"></a>        <span class="at">panel.grid =</span> <span class="fu">element_blank</span>(),  <span class="co"># 移除网格线</span></span>
+<span id="cb4-35"><a href="scatter-plot.html#cb4-35" tabindex="-1"></a>        <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">1</span>, <span class="at">r =</span> <span class="dv">1</span>, <span class="at">b =</span> <span class="dv">1</span>, <span class="at">l =</span> <span class="dv">1</span>, <span class="at">unit =</span> <span class="st">&quot;cm&quot;</span>),  <span class="co"># 设置绘图边距</span></span>
+<span id="cb4-36"><a href="scatter-plot.html#cb4-36" tabindex="-1"></a>        <span class="at">aspect.ratio =</span> <span class="dv">1</span>,  <span class="co"># 设置绘图宽高比</span></span>
+<span id="cb4-37"><a href="scatter-plot.html#cb4-37" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.75</span>),  <span class="co"># 设置图例位置</span></span>
+<span id="cb4-38"><a href="scatter-plot.html#cb4-38" tabindex="-1"></a>        <span class="at">panel.border =</span> <span class="fu">element_rect</span>(<span class="at">linewidth =</span> <span class="dv">1</span>))  <span class="co"># 添加面板边框</span></span>
+<span id="cb4-39"><a href="scatter-plot.html#cb4-39" tabindex="-1"></a><span class="fu">print</span>(p1)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scatter-plot2"></span>
+<img src="assets/figure-scatter-plot2-1.png" alt="散点拟合图示例2" width="576" />
+<p class="caption">
+Figure 2.2: 散点拟合图示例2
+</p>
+</div>
+</div>
+<div id="scatter-fit-plot3" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> 散点拟合图3<a href="scatter-plot.html#scatter-fit-plot3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>ggpmisc重点是与拟合模型相关的注释和绘图。模型拟合对象的估计值可以以文字、模型方程、方差分析和摘要表的形式在ggplot中显示。预测值、残差、偏差和权重可以绘制出各种模型拟合函数的图。支持线性模型、多项式回归、分位数回归、长轴回归、非线性回归以及不同的鲁棒和抗性回归方法，以及基于这些方法的用户自定义包装函数。这里展示其进行散点拟合。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="scatter-plot.html#cb5-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb5-2"><a href="scatter-plot.html#cb5-2" tabindex="-1"></a><span class="fu">library</span>(ggpmisc)</span>
+<span id="cb5-3"><a href="scatter-plot.html#cb5-3" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb5-4"><a href="scatter-plot.html#cb5-4" tabindex="-1"></a><span class="fu">library</span>(ggstyle)</span>
+<span id="cb5-5"><a href="scatter-plot.html#cb5-5" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb5-6"><a href="scatter-plot.html#cb5-6" tabindex="-1"></a><span class="co"># ==================== 1. 全局主题 ====================</span></span>
+<span id="cb5-7"><a href="scatter-plot.html#cb5-7" tabindex="-1"></a>my_theme <span class="ot">&lt;-</span> <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span> <span class="fu">set_font</span>()</span>
+<span id="cb5-8"><a href="scatter-plot.html#cb5-8" tabindex="-1"></a><span class="fu">theme_set</span>(my_theme)</span>
+<span id="cb5-9"><a href="scatter-plot.html#cb5-9" tabindex="-1"></a><span class="fu">options</span>(<span class="at">ggplot2.discrete.colour =</span> ggsci<span class="sc">::</span>scale_color_npg)</span>
+<span id="cb5-10"><a href="scatter-plot.html#cb5-10" tabindex="-1"></a><span class="fu">options</span>(<span class="at">ggplot2.discrete.fill   =</span> ggsci<span class="sc">::</span>scale_fill_npg)</span>
+<span id="cb5-11"><a href="scatter-plot.html#cb5-11" tabindex="-1"></a><span class="co"># ==================== 2. 绘图  ====================</span></span>
+<span id="cb5-12"><a href="scatter-plot.html#cb5-12" tabindex="-1"></a>formula <span class="ot">&lt;-</span> y <span class="sc">~</span> x <span class="sc">+</span> <span class="fu">I</span>(x<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb5-13"><a href="scatter-plot.html#cb5-13" tabindex="-1"></a><span class="fu">ggplot</span>(cars, <span class="fu">aes</span>(speed, dist)) <span class="sc">+</span></span>
+<span id="cb5-14"><a href="scatter-plot.html#cb5-14" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb5-15"><a href="scatter-plot.html#cb5-15" tabindex="-1"></a>  <span class="co"># stat_fit_deviations(formula = formula, colour = &quot;red&quot;) +</span></span>
+<span id="cb5-16"><a href="scatter-plot.html#cb5-16" tabindex="-1"></a>  <span class="fu">stat_poly_line</span>(<span class="at">formula =</span> formula,<span class="at">colour =</span> <span class="st">&quot;blue4&quot;</span>,<span class="at">fill =</span> <span class="st">&quot;red4&quot;</span>) <span class="sc">+</span> <span class="co"># 显示拟合线，根据公式</span></span>
+<span id="cb5-17"><a href="scatter-plot.html#cb5-17" tabindex="-1"></a>  <span class="fu">stat_poly_eq</span>(<span class="fu">use_label</span>(<span class="fu">c</span>(<span class="st">&quot;eq&quot;</span>, <span class="st">&quot;adj.R2&quot;</span>, <span class="st">&quot;P&quot;</span>)), <span class="at">formula =</span> formula) <span class="co"># 显示方程</span></span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scatter-plot3"></span>
+<img src="assets/figure-scatter-plot3-1.png" alt="散点拟合图示例3" width="576" />
+<p class="caption">
+Figure 2.3: 散点拟合图示例3
 </p>
 </div>
 

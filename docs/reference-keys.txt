@@ -1,9 +1,13 @@
-fig:scatter-plot
+fig:scatter-plot1
+fig:scatter-plot2
+fig:scatter-plot3
 fig:line-plot
 Introduction
 Structure
 Use
 scatter-plot
-scatter-fit-plot
+scatter-fit-plot1
+scatter-fit-plot2
+scatter-fit-plot3
 line-plot
 multi-line-plot
